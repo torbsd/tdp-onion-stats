@@ -35,13 +35,17 @@ Feel free to open Issues with us or ask questions on IRC.
 The `simple-reports.sh` script relies on [jq](https://stedolan.github.io/jq/).
 Under OpenBSD it is available in ports and can be installed like this:
 
-    $ doas pkg_add jq
+```
+$ doas pkg_add jq
+```
 
 The `rankit.pl` script relies on
 [Modern::Perl](https://metacpan.org/pod/Modern::Perl).  Under OpeBSD
-it can be installed thusly:
+it can be installed like so:
 
-    $ doas pkg_add p5-Modern-Perl
+```
+$ doas pkg_add p5-Modern-Perl
+```
 
 ## Repository Details ##
 

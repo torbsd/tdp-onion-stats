@@ -13,6 +13,7 @@ bplate=${bplate-bplate}
 outdir=${outdir-.}
 indir=${indir-.}
 details=details.json
+rawtmp=details.raw
 
 # spit out a helpful message, possibly with an error, and then exit
 usage () {
@@ -78,9 +79,13 @@ report () {
 		echo "" >> ${out}
 		# pull wanted cols out of details.json but only for running relays
 		# pipe the raw data into rankit.pl
-		jq -c --raw-output \
-		   '.relays[]|select(.running)|"\(.platform)|\(.observed_bandwidth)|\(.country)|\(.as_number)|\(.as_name)|\(.consensus_weight_fraction)"' \
-		   < ${indir}/${details} | perl ${rankitpl} $* >>${out}
+		if [ ! -f ${indir}/${rawtmp} ]; then
+			echo "::: generating ${indir}/${rawtmp}"
+			jq -c --raw-output \
+			   '.relays[]|select(.running)|"\(.platform)|\(.observed_bandwidth)|\(.country)|\(.as_number)|\(.as_name)|\(.consensus_weight_fraction)"' \
+			   < ${indir}/${details} > ${indir}/${rawtmp}
+		fi
+		perl ${rankitpl} $* < ${indir}/${rawtmp} >>${out}
 		echo "" >> ${out}
 		[ -f ${bplate}/footer_${nm}.txt ] && cat ${bplate}/footer_${nm}.txt >> ${out}
 		[ -f ${bplate}/bottom.txt ] && cat ${bplate}/bottom.txt >> ${out}
@@ -102,6 +107,10 @@ done
 }
 [ ! -d ${outdir} ] && {
 	die "output directory does not exist: ${outdir}"
+}
+[ -f ${indir}/${rawtmp} ] && {
+	echo ":: clearing out old temp file ${indir}/${rawtmp}"
+	rm ${indir}/${rawtmp}
 }
 
 # by OS: total bandwidth, raw count, consensus_weight fraction

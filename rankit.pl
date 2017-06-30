@@ -9,6 +9,7 @@ use POSIX qw(strftime);
 
 our $DEBUG = 0;
 our %RANK;
+our @LABELS;
 our %COUNT;
 our $TOTAL = 0;
 our $LINES = 0;
@@ -26,15 +27,15 @@ our $LABEL = undef;
 our $REPORT = undef;
 our $HTML = 0;
 our $DATE = strftime("%Y-%m-%d",localtime(time));
-our $VERSION = '1.0';
 our $NUMFMT = '%.1lf';
 our $MAXLABEL = 50;
+our $VERSION = '1.0';
 
 $Getopt::Std::STANDARD_HELP_VERSION = 1;
 sub VERSION_MESSAGE { print STDERR qq|rankit.pl v.$VERSION\n|; }
 sub HELP_MESSAGE {
 	print STDERR <<__HeLP__;
-usage: rankit.pl [-HINOPV] [-t col] [-v col] [-s sep]
+usage: rankit.pl [-HINOPV] [-t col] [-v col] [-s sep] [-x maxlen]
   bool opts:
     -H				HTML output (default text)
     -I				value is percentage, dont treat as raw val
@@ -105,7 +106,6 @@ sub rankit {
 }
 
 sub html_output {
-	my @k = (sort { $RANK{$b} <=> $RANK{$a} } keys %RANK);
 	print "<!DOCTYPE html>\n";
 	print "<HTML>\n";
 	print " <HEAD>\n";
@@ -126,7 +126,7 @@ sub html_output {
 	print "  <H1>$LABEL by $REPORT - $DATE</H1>\n";
 	print "  <DIV class='chart'>\n";
 	my $fudge = 5;
-	foreach (@k) {
+	foreach (@LABELS) {
 		my $r = $RANK{$_};
 		my $c = int(100*($r/$TOTAL));
 		my $c_ = sprintf("%.2f",100*($r/$TOTAL));
@@ -141,10 +141,9 @@ sub html_output {
 }
 
 sub text_output {
-	my @k = (sort { $RANK{$b} <=> $RANK{$a} } keys %RANK);
 	my($w) = (sort { $b <=> $a }
 		  map { length(sprintf("%s (%d)",$_,$COUNT{$_} || 0)) }
-		  (@k,"TOTAL ($LINES)"));
+		  (@LABELS,"TOTAL ($LINES)"));
 
 	if ($LABEL) {
 		printf("%*s  %s\n",-$w,"$REPORT (count)",$LABEL);
@@ -153,7 +152,7 @@ sub text_output {
 	unless ($IS_PERCENT) {
 		printf("%*s  $NUMFMT\n",-$w,"TOTAL ($LINES)",$TOTAL);
 	}
-	foreach (@k) {
+	foreach (@LABELS) {
 		my $r = $RANK{$_};
 		my $n = sprintf("%s (%d)",$_,$COUNT{$_});
 		if ($NO_PERCENT || $IS_PERCENT) {
@@ -180,6 +179,7 @@ while (<STDIN>) {
 	$value = 0+$value;
 	rankit($thing,$value);
 }
+@LABELS = sort { $RANK{$b} <=> $RANK{$a} } keys %RANK;
 
 if ($HTML) {
 	html_output();

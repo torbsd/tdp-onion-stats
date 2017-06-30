@@ -1,0 +1,6 @@
+
+Copyright (C) 2017 by Tor Diversity Project <tdp@nycbug.org>
+All Rights Reserved.
+
+Released under an ISC license; see the GitHub repository
+for details at https://github.com/torbsd/tdp-onion-stats

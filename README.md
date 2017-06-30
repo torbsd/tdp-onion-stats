@@ -64,29 +64,31 @@ Our process is as follows:
 
 1. Run `get-all.sh` to produce a directory named `YYYYMMDD`:
 
-    # for example:
-    $ date +%Y%m%d
-    20170629
-    # we only need details for now
-    $ ./get-all.sh details
-    # now ./20170629/details.json exists
+```
+$ date +%Y%m%d
+20170629
+$ ./get-all.sh details
+# now ./20170629/details.json exists
+```
 
 2. Run `simple-reports.sh` to produce .txt reports; by default
 they will go in the current directory, but you can use the `--outdir`
 option to change this:
 
-    $ ./simple-reports.sh --indir=20170629 --outdir=20170629
-    :: generating 20170629/bw-by-os.txt
-    :: generating 20170629/os-count.txt
-    :: generating 20170629/cweight-by-os.txt
-    :: generating 20170629/bw-by-vers.txt
-    :: generating 20170629/vers-count.txt
-    :: generating 20170629/cweight-by-vers.txt
-    :: generating 20170629/bw-by-cc.txt
-    :: generating 20170629/cweight-by-cc.txt
-    :: generating 20170629/bw-by-as.txt
-    :: generating 20170629/bw-by-asn.txt
-    :: generating 20170629/cweight-by-as.txt
-    :: generating 20170629/cweight-by-asn.txt
+```
+$ ./simple-reports.sh --indir=20170629 --outdir=20170629
+:: generating 20170629/bw-by-os.txt
+:: generating 20170629/os-count.txt
+:: generating 20170629/cweight-by-os.txt
+:: generating 20170629/bw-by-vers.txt
+:: generating 20170629/vers-count.txt
+:: generating 20170629/cweight-by-vers.txt
+:: generating 20170629/bw-by-cc.txt
+:: generating 20170629/cweight-by-cc.txt
+:: generating 20170629/bw-by-as.txt
+:: generating 20170629/bw-by-asn.txt
+:: generating 20170629/cweight-by-as.txt
+:: generating 20170629/cweight-by-asn.txt
+```
 
 Let us know if you have any problems.

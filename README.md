@@ -49,6 +49,8 @@ $ doas pkg_add p5-Modern-Perl
 
 ## Repository Details ##
 
+Scripts in this repository:
+
 * [get-all.sh](get-all.sh): download a dump of all current stats into
 a date-stamped directory, produce compressed tarball of the result for
 easy copying.
@@ -71,6 +73,7 @@ Our process is as follows:
 ```
 $ date +%Y%m%d
 20170629
+# we only need the details data for now
 $ ./get-all.sh details
 # now ./20170629/details.json exists
 ```

@@ -14,6 +14,8 @@ outdir=${outdir-.}
 indir=${indir-.}
 details=details.json
 rawtmp=details.raw
+noclear=0
+overwrite=0
 
 # spit out a helpful message, possibly with an error, and then exit
 usage () {
@@ -25,6 +27,8 @@ usage () {
 	}
 	echo "usage: ${script} [--options] [args]"
 	echo "    --help            this message"
+	echo "    --noclear         dont clear old temp files at startup"
+	echo "    --overwrite       overwrite existing output files"
 	echo "    --outdir=dir      drop output files in dir, default is ${outdir}"
 	echo "    --indir=dir       find input files in dir, default is ${indir}"
 	echo "    --bplate=dir      find report boilerplate in dir, default is ${bplate}"
@@ -68,7 +72,7 @@ report () {
 	nm=$1
 	shift
 	out="${outdir}/${nm}".txt
-	if [ -f ${out} ]; then
+	if [ -f ${out} -a ${overwrite} -eq 0 ]; then
 	    echo ".. ${out} exists - skipping"
 	else
 		echo ":: generating ${out}"
@@ -96,6 +100,7 @@ report () {
 while [ $# -gt 0 ]; do
 	case "$1" in
 		--help)				 usage ;;
+		--noclear|--overwrite)		 setopt "$1" ;;
 		--outdir=*|--indir=*|--bplate=*) setoptval "$1" ;;
 		*)				 usage "bad argument" ;;
 	esac
@@ -108,7 +113,7 @@ done
 [ ! -d ${outdir} ] && {
 	die "output directory does not exist: ${outdir}"
 }
-[ -f ${indir}/${rawtmp} ] && {
+[ -f ${indir}/${rawtmp} -a ${noclear} -eq 0 ] && {
 	echo ":: clearing out old temp file ${indir}/${rawtmp}"
 	rm ${indir}/${rawtmp}
 }

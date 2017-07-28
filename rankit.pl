@@ -5,6 +5,7 @@
 
 use Modern::Perl;
 use Getopt::Std;
+use Scalar::Util qw(looks_like_number);
 use POSIX qw(strftime);
 
 our $DEBUG = 0;
@@ -206,7 +207,9 @@ while (<STDIN>) {
 	++$LINES;
 	my($thing,$value) = ($fields[$THINGCOL],$fields[$VALCOL]);
 	$value = 1 if $NO_VALUE;
-	$value = 0+$value unless $VAL_LIST;
+	if (looks_like_number($value)) {
+		$value = 0+$value;
+	}
 	rankit($thing,$value);
 }
 @LABELS = sort { $RANK{$b} <=> $RANK{$a} } keys %RANK;

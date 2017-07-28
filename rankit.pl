@@ -30,7 +30,7 @@ our $LABEL = undef;
 our $REPORT = undef;
 our $HTML = 0;
 our $DATE = strftime("%Y-%m-%d",localtime(time));
-our $NUMFMT = '%.1lf';
+our $NUMFMT = '%.0lf';
 our $MAXLABEL = 50;
 our $VERSION = '1.0';
 

@@ -13,7 +13,6 @@ bplate=${bplate-bplate}
 outdir=${outdir-.}
 indir=${indir-.}
 details=details.json
-rawtmp=details.raw
 noclear=0
 overwrite=0
 
@@ -66,12 +65,19 @@ die () {
 	exit 1
 }
 
-# generate one report; output filename is first param, rest are for rankit.pl
+# report bridges details.json bw-by-os "...jq query..."
 report () {
-	typeset nm out
+	typeset what fn nm q out
+	what=$1
+	shift
+	fn=$1
+	shift
 	nm=$1
 	shift
-	out="${outdir}/${nm}".txt
+	q="$1"
+	shift
+	rankopts="$*"
+	out="${outdir}/${what}-${nm}".txt
 	if [ -f ${out} -a ${overwrite} -eq 0 ]; then
 	    echo ".. ${out} exists - skipping"
 	else
@@ -83,17 +89,36 @@ report () {
 		echo "" >> ${out}
 		# pull wanted cols out of details.json but only for running relays
 		# pipe the raw data into rankit.pl
+		tmp=${fn}.raw
 		if [ ! -f ${indir}/${rawtmp} ]; then
-			echo "::: generating ${indir}/${rawtmp}"
-			jq -c --raw-output \
-			   '.relays[]|select(.running)|"\(.platform)|\(.observed_bandwidth)|\(.country)|\(.as_number)|\(.as_name)|\(.consensus_weight_fraction)"' \
-			   < ${indir}/${details} > ${indir}/${rawtmp}
+			echo "::: generating ${tmp} from ${fn}.json"
+			jq -c --raw-output "${q}" \
+			   < ${indir}/${fn}.json > ${indir}/${tmp}
 		fi
-		perl ${rankitpl} $* < ${indir}/${rawtmp} >>${out}
+		perl ${rankitpl} ${rankopts} < ${indir}/${tmp} >>${out}
 		echo "" >> ${out}
 		[ -f ${bplate}/footer_${nm}.txt ] && cat ${bplate}/footer_${nm}.txt >> ${out}
 		[ -f ${bplate}/bottom.txt ] && cat ${bplate}/bottom.txt >> ${out}
 	fi
+
+	
+}
+
+# generate one report; output filename is first param, rest are for rankit.pl
+relays () {
+	typeset nm
+	nm=$1
+	shift
+	report relays details ${nm} '.relays[]|select(.running)|"\(.platform)|\(.observed_bandwidth)|\(.country)|\(.as_number)|\(.as_name)|\(.consensus_weight_fraction)"' $*
+}
+
+bridges () {
+	typeset nm fn
+	nm=$1
+	shift
+	fn=$1
+	shift
+	report bridges details '.bridges[]|select(.running)|"\(.platform)|\(.advertised_bandwidth)|\(.transports)"' $*
 }
 
 # parse command-line options
@@ -118,22 +143,31 @@ done
 	rm ${indir}/${rawtmp}
 }
 
+## Relay Reports
+
 # by OS: total bandwidth, raw count, consensus_weight fraction
-report bw-by-os		-O BANDWIDTH OS
-report os-count		-ON COUNT OS
-report cweight-by-os	-OI -v 5 CONSENSUS_WEIGHT_FRAC OS
+relays bw-by-os		-O BANDWIDTH OS
+relays os-count		-ON COUNT OS
+relays cweight-by-os	-OI -v 5 CONSENSUS_WEIGHT_FRAC OS
 
 # by Tor version: bw, count, cw_frac
-report bw-by-vers	-V BANDWIDTH VERS
-report vers-count	-VN COUNT VERS
-report cweight-by-vers	-VI -v 5 CONSENSUS_WEIGHT_FRAC VERS
+relays bw-by-vers	-V BANDWIDTH VERS
+relays vers-count	-VN COUNT VERS
+relays cweight-by-vers	-VI -v 5 CONSENSUS_WEIGHT_FRAC VERS
 
 # by country: bandwidth, cw
-report bw-by-cc		-l 2 BANDWIDTH COUNTRY
-report cweight-by-cc	-I -l 2 -v 5 CONSENSUS_WEIGHT_FRAC COUNTRY
+relays bw-by-cc		-l 2 BANDWIDTH COUNTRY
+relays cweight-by-cc	-I -l 2 -v 5 CONSENSUS_WEIGHT_FRAC COUNTRY
 
 # by AS and ASN: bandwidth, cw
-report bw-by-as		-l 3 BANDWIDTH AS
-report bw-by-asn	-l 4 BANDWIDTH AS_NAME
-report cweight-by-as	-I -l 3 -v 5 CONSENSUS_WEIGHT_FRAC AS
-report cweight-by-asn	-I -l 4 -v 5 CONSENSUS_WEIGHT_FRAC AS_NAME
+relays bw-by-as		-l 3 BANDWIDTH AS
+relays bw-by-asn	-l 4 BANDWIDTH AS_NAME
+relays cweight-by-as	-I -l 3 -v 5 CONSENSUS_WEIGHT_FRAC AS
+relays cweight-by-asn	-I -l 4 -v 5 CONSENSUS_WEIGHT_FRAC AS_NAME
+
+## Bridge Reports
+
+# by OS: bandwidth
+bridges bw-by-os	-O BANDWIDTH OS
+bridges os-count	-ON COUNT OS
+#bridges trans-count	-N -l 2 COUNT TRANSPORTS

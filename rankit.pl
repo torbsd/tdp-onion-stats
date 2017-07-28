@@ -206,7 +206,7 @@ while (<STDIN>) {
 	++$LINES;
 	my($thing,$value) = ($fields[$THINGCOL],$fields[$VALCOL]);
 	$value = 1 if $NO_VALUE;
-	$value = 0+$value;
+	$value = 0+$value unless $VAL_LIST;
 	rankit($thing,$value);
 }
 @LABELS = sort { $RANK{$b} <=> $RANK{$a} } keys %RANK;

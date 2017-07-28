@@ -133,7 +133,7 @@ sub rankit {
 	}
 	$key = substr($key,0,$MAXLABEL) if $MAXLABEL;
 	$COUNT{$key}++;
-	$RANK{$key} += $value;
+	$RANK{$key} += looks_like_number($value) ? 0+$value : 1;
 	$TOTAL += $value;
 }
 
@@ -208,9 +208,6 @@ while (<STDIN>) {
 	++$LINES;
 	my($thing,$value) = ($fields[$THINGCOL],$fields[$VALCOL]);
 	$value = 1 if $NO_VALUE;
-	if (looks_like_number($value)) {
-		$value = 0+$value;
-	}
 	rankit($thing,$value);
 }
 @LABELS = sort { $RANK{$b} <=> $RANK{$a} } keys %RANK;

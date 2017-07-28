@@ -74,7 +74,7 @@ $SIG{__WARN__} = sub {
 sub opt { defined($OPTS{$_[0]}) ? $OPTS{$_[0]} : ($_[1] || 0) }
 
 # process command-line args
-getopts('DHINOPVl:v:s:x:',\%OPTS);
+getopts('DHILNOPUVl:v:s:x:',\%OPTS);
 $LABEL	    = shift(@ARGV) if @ARGV;
 $REPORT     = shift(@ARGV) if @ARGV;
 $DEBUG	    = opt('D');

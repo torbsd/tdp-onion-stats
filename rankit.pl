@@ -130,10 +130,8 @@ sub rankit {
 		$key =~ s/^Tor\s([0-9a-z\.\-]+)\s.*$/$1/;
 	} elsif ($PLAT_LIST) {
 		my @keys = delist($key);
-		if (scalar(@keys) > 1) {
-			really_rankit($_,$value) foreach (@keys);
-			return;
-		} # else fall through on the recursive call
+		really_rankit($_,$value) foreach (@keys);
+		return;
 	}
 	if ($VAL_LIST) {
 		my @vals = delist($value);

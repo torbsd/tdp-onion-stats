@@ -99,6 +99,7 @@ unless ($REPORT) {
 
 sub delist {
 	my $thing = shift;
+	return undef unless $thing;
 	if ((substr($thing,0,1) eq "[") && (substr($thing,-1,1) eq "]")) {
 	        return (map { $_ =~ s/(^"|"$)//gs; $_; }
 			split(/,/,substr($thing,1,-2)));

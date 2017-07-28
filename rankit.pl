@@ -31,6 +31,7 @@ our $REPORT = undef;
 our $HTML = 0;
 our $DATE = strftime("%Y-%m-%d",localtime(time));
 our $NUMFMT = '%.0lf';
+our $PERCFMT = '%.1lf%%';
 our $MAXLABEL = 50;
 our $VERSION = '1.0';
 
@@ -193,7 +194,7 @@ sub text_output {
 		printf("%s  %s\n","=" x $w, "=" x (80 - $w - 3));
 	}
 	unless ($IS_PERCENT) {
-		printf("%*s  $NUMFMT\n",-$w,"TOTAL ($LINES)",$TOTAL);
+		printf("%*s  ${NUMFMT}\n",-$w,"TOTAL ($LINES)",$TOTAL);
 	}
 	foreach (@LABELS) {
 		my $r = $RANK{$_};
@@ -203,12 +204,12 @@ sub text_output {
 			my $fmt = $NUMFMT;
 			if ($IS_PERCENT) {
 				$r *= 100;
-				$fmt .= '%%';
+				$fmt = $PERCFMT;
 			}
 			$r = sprintf($fmt,$r);
 			printf("%*s  %s\n",-$w,$n,$r);
 		} else {
-			my $c = sprintf("${NUMFMT}%%",100*($r/$TOTAL));
+			my $c = sprintf("${PERCFMT}",100*($r/$TOTAL));
 			printf("%*s  ${NUMFMT} (%s)\n",-$w,$n,$r,$c);
 		}
 	}

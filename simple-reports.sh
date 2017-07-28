@@ -141,13 +141,13 @@ done
 
 # by OS: total bandwidth, raw count, consensus_weight fraction
 relays bw-by-os		-O BANDWIDTH OS
-relays os-count		-ON COUNT OS
-relays cweight-by-os	-OI -v 5 CONSENSUS_WEIGHT_FRAC OS
+relays os-count		-NO COUNT OS
+relays cweight-by-os	-IO -v 5 CONSENSUS_WEIGHT_FRAC OS
 
 # by Tor version: bw, count, cw_frac
 relays bw-by-vers	-V BANDWIDTH VERS
-relays vers-count	-VN COUNT VERS
-relays cweight-by-vers	-VI -v 5 CONSENSUS_WEIGHT_FRAC VERS
+relays vers-count	-NV COUNT VERS
+relays cweight-by-vers	-IV -v 5 CONSENSUS_WEIGHT_FRAC VERS
 
 # by country: bandwidth, cw
 relays bw-by-cc		-l 2 BANDWIDTH COUNTRY
@@ -163,5 +163,6 @@ relays cweight-by-asn	-I -l 4 -v 5 CONSENSUS_WEIGHT_FRAC AS_NAME
 
 # by OS: bandwidth
 bridges bw-by-os	-O BANDWIDTH OS
-bridges os-count	-ON COUNT OS
-#bridges trans-count	-N -l 2 COUNT TRANSPORTS
+bridges os-count	-NO COUNT OS
+bridges trans-count	-LN -l 2 COUNT TRANSPORT
+bridges trans-by-os	-OU -l 0 -v 2 TRANSPORT OS

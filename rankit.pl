@@ -18,6 +18,7 @@ our $SEP = '|';
 our $PLAT_OS = 0;
 our $PLAT_VERS = 0;
 our $PLAT_LIST = 0;
+our $VAL_LIST = 0;
 our $NO_PERCENT = 0;
 our $IS_PERCENT = 0;
 our $NO_VALUE = 0;
@@ -36,13 +37,15 @@ $Getopt::Std::STANDARD_HELP_VERSION = 1;
 sub VERSION_MESSAGE { print STDERR qq|rankit.pl v.$VERSION\n|; }
 sub HELP_MESSAGE {
 	print STDERR <<__HeLP__;
-usage: rankit.pl [-HINOPV] [-t col] [-v col] [-s sep] [-x maxlen]
+usage: rankit.pl [-HILNOPV] [-t col] [-v col] [-s sep] [-x maxlen]
   bool opts:
     -H				HTML output (default text)
     -I				value is percentage, dont treat as raw val
+    -L                          label is a Perly/Pythonic list (use with -N)
     -N				ignore values, just report counts
     -O				extract OS from label
     -P				do not report percentages in output
+    -U                          value is a Perly/Pythonic list
     -V				extract Tor version from label
   opts with args:
     -x maxlen			max length of label (def 50)
@@ -81,6 +84,7 @@ $PLAT_OS    = opt('O');
 $NO_PERCENT = opt('P');
 $PLAT_VERS  = opt('V');
 $PLAT_LIST  = opt('L');
+$VAL_LIST   = opt('U');
 $THINGCOL   = int(opt('l',$THINGCOL));
 $VALCOL     = int(opt('v',$VALCOL));
 $SEP        = opt('s',$SEP);
@@ -92,6 +96,15 @@ unless ($REPORT) {
 	$REPORT = "VERSION" if $PLAT_VERS;
 }
 
+sub delist {
+	my $thing = shift;
+	if ((substr($thing,0,1) eq "[") && (substr($thing,-1,1) eq "]")) {
+	        return (map { $_ =~ s/(^"|"$)//gs; $_; }
+			split(/,/,substr($thing,1,-2)));
+	} 
+	return undef;
+}
+
 sub rankit {
 	my($thing,$value) = @_;
 	my $key = $thing;
@@ -101,13 +114,20 @@ sub rankit {
 	} elsif ($PLAT_VERS) {
 		$key =~ s/^Tor\s([0-9a-z\.\-]+)\s.*$/$1/;
 	} elsif ($PLAT_LIST) {
-		# used for e.g. bridge transports
-		if ((substr($key,0,1) eq "[") && (substr($key,-1,1) eq "]")) {
-			my @keys = (map { $_ =~ s/(^"|"$)//gs; $_; }
-				    split(/,/,substr($str,1,-2)));
+		my @keys = delist($key);
+		if (@keys) {
 			rankit($_,$value) foreach (@keys);
 			return;
 		} # else fall through on the recursive call
+	}
+	if ($VAL_LIST) {
+		my @vals = delist($value);
+		if (@vals) {
+			foreach my $v (@vals) {
+				my $composite = "${key}:${v}";
+				rankit($composite,1);
+			}
+		} # else fall through on recursive call
 	}
 	$key = substr($key,0,$MAXLABEL) if $MAXLABEL;
 	$COUNT{$key}++;

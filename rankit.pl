@@ -124,16 +124,20 @@ sub rankit {
 	}
 	if ($VAL_LIST) {
 		my @vals = delist($value);
-		if (scalar(@vals) > 1) {
-			foreach my $v (@vals) {
-				my $composite = "${key}:${v}";
-				rankit($composite,1);
-			}
-		} # else fall through on recursive call
+		foreach my $v (@vals) {
+			my $composite = "${key}:${v}";
+			rankit($composite,1);
+		}
+		return;
 	}
 	$key = substr($key,0,$MAXLABEL) if $MAXLABEL;
 	$COUNT{$key}++;
-	$RANK{$key} += looks_like_number($value) ? 0+$value : 1;
+	if (looks_like_number($value)) {
+		$value = 0+$value;
+	} else {
+		$value = 1;
+	}
+	$RANK{$key} += $value;
 	$TOTAL += $value;
 }
 

@@ -124,7 +124,9 @@ sub rankit {
 	}
 	if ($VAL_LIST) {
 		my @vals = delist($value);
+		return unless @vals;
 		foreach my $v (@vals) {
+			$v = '?' unless defined $v;
 			my $composite = "${key}:${v}";
 			rankit($composite,1);
 		}

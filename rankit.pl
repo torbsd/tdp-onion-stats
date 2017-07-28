@@ -117,14 +117,14 @@ sub rankit {
 		$key =~ s/^Tor\s([0-9a-z\.\-]+)\s.*$/$1/;
 	} elsif ($PLAT_LIST) {
 		my @keys = delist($key);
-		if (@keys) {
+		if (scalar(@keys) > 1) {
 			rankit($_,$value) foreach (@keys);
 			return;
 		} # else fall through on the recursive call
 	}
 	if ($VAL_LIST) {
 		my @vals = delist($value);
-		if (@vals) {
+		if (scalar(@vals) > 1) {
 			foreach my $v (@vals) {
 				my $composite = "${key}:${v}";
 				rankit($composite,1);

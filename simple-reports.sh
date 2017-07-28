@@ -165,4 +165,4 @@ relays cweight-by-asn	-I -l 4 -v 5 CONSENSUS_WEIGHT_FRAC AS_NAME
 bridges bw-by-os	-O BANDWIDTH OS
 bridges os-count	-NO COUNT OS
 bridges trans-count	-LN -l 2 COUNT TRANSPORT
-bridges trans-by-os	-OU -l 0 -v 2 TRANSPORT OS
+bridges trans-os	-OU -l 0 -v 2 COUNT OS:TRANSPORT

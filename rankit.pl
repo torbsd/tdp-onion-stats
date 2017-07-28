@@ -109,6 +109,7 @@ sub delist {
 
 sub really_rankit {
 	my($key,$value) = @_;
+	$key = 'null' unless defined $key;
 	$key = substr($key,0,$MAXLABEL) if $MAXLABEL;
 	$COUNT{$key}++;
 	if (looks_like_number($value)) {
@@ -187,7 +188,8 @@ sub text_output {
 		  (@LABELS,"TOTAL ($LINES)"));
 
 	if ($LABEL) {
-		printf("%*s  %s\n",-$w,"$REPORT (count)",$LABEL);
+		my $paren = ($NO_VALUE || $VAL_LIST) ? "" : " (records)";
+		printf("%*s  %s\n",-$w,"${REPORT}${paren}",$LABEL);
 		printf("%s  %s\n","=" x $w, "=" x (80 - $w - 3));
 	}
 	unless ($IS_PERCENT) {
@@ -195,7 +197,8 @@ sub text_output {
 	}
 	foreach (@LABELS) {
 		my $r = $RANK{$_};
-		my $n = sprintf("%s (%d)",$_,$COUNT{$_});
+		my $n = ($NO_VALUE || $VAL_LIST) ? "$_" :
+			sprintf("%s (%d)",$_,$COUNT{$_});
 		if ($NO_PERCENT || $IS_PERCENT) {
 			my $fmt = $NUMFMT;
 			if ($IS_PERCENT) {

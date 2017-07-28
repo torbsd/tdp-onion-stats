@@ -65,7 +65,8 @@ die () {
 	exit 1
 }
 
-# report bridges details.json bw-by-os "...jq query..."
+# report bridges details bw-by-os "...jq query..." rankit_opts
+# report relays details bw-by-os "...jq query..." rankit_opts
 report () {
 	typeset what fn nm q out
 	what=$1
@@ -79,18 +80,19 @@ report () {
 	rankopts="$*"
 	out="${outdir}/${what}-${nm}".txt
 	if [ -f ${out} -a ${overwrite} -eq 0 ]; then
-	    echo ".. ${out} exists - skipping"
+		echo ".. ${out} exists - skipping"
 	else
 		echo ":: generating ${out}"
 		[ -f ${bplate}/top.txt ] && cat ${bplate}/top.txt > ${out}
+		echo "Report Type: ${what}" >> ${out}
 		echo "Report Date: `date -u`" >> ${out}
 		echo "Data Source: https://onionoo.torproject.org" >> ${out}
 		[ -f ${bplate}/header_${nm}.txt ] && cat ${bplate}/header_${nm}.txt >> ${out}
 		echo "" >> ${out}
 		# pull wanted cols out of details.json but only for running relays
 		# pipe the raw data into rankit.pl
-		tmp=${fn}.raw
-		if [ ! -f ${indir}/${rawtmp} ]; then
+		tmp=${what}-${fn}.raw
+		if [ ! -f ${indir}/${tmp} ]; then
 			echo "::: generating ${tmp} from ${fn}.json"
 			jq -c --raw-output "${q}" \
 			   < ${indir}/${fn}.json > ${indir}/${tmp}
@@ -100,8 +102,6 @@ report () {
 		[ -f ${bplate}/footer_${nm}.txt ] && cat ${bplate}/footer_${nm}.txt >> ${out}
 		[ -f ${bplate}/bottom.txt ] && cat ${bplate}/bottom.txt >> ${out}
 	fi
-
-	
 }
 
 # generate one report; output filename is first param, rest are for rankit.pl
@@ -116,9 +116,7 @@ bridges () {
 	typeset nm fn
 	nm=$1
 	shift
-	fn=$1
-	shift
-	report bridges details '.bridges[]|select(.running)|"\(.platform)|\(.advertised_bandwidth)|\(.transports)"' $*
+	report bridges details ${nm} '.bridges[]|select(.running)|"\(.platform)|\(.advertised_bandwidth)|\(.transports)"' $*
 }
 
 # parse command-line options
@@ -132,15 +130,11 @@ while [ $# -gt 0 ]; do
 	shift
 done
 
-[ ! -f ${indir}/${details} ] && {
-	die "could not find input file: ${indir}/${details}"
+[ ! -f ${indir}/details.json ] && {
+	die "could not find input file: ${indir}/details.json"
 }
 [ ! -d ${outdir} ] && {
 	die "output directory does not exist: ${outdir}"
-}
-[ -f ${indir}/${rawtmp} -a ${noclear} -eq 0 ] && {
-	echo ":: clearing out old temp file ${indir}/${rawtmp}"
-	rm ${indir}/${rawtmp}
 }
 
 ## Relay Reports

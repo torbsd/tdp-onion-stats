@@ -107,6 +107,19 @@ sub delist {
 	return undef;
 }
 
+sub really_rankit {
+	my($key,$value) = @_;
+	$key = substr($key,0,$MAXLABEL) if $MAXLABEL;
+	$COUNT{$key}++;
+	if (looks_like_number($value)) {
+		$value = 0+$value;
+	} else {
+		$value = 1;
+	}
+	$RANK{$key} += $value;
+	$TOTAL += $value;
+}
+
 sub rankit {
 	my($thing,$value) = @_;
 	my $key = $thing;
@@ -118,7 +131,7 @@ sub rankit {
 	} elsif ($PLAT_LIST) {
 		my @keys = delist($key);
 		if (scalar(@keys) > 1) {
-			rankit($_,$value) foreach (@keys);
+			really_rankit($_,$value) foreach (@keys);
 			return;
 		} # else fall through on the recursive call
 	}
@@ -128,19 +141,11 @@ sub rankit {
 		foreach my $v (@vals) {
 			$v = '?' unless defined $v;
 			my $composite = "${key}:${v}";
-			rankit($composite,1);
+			really_rankit($composite,1);
 		}
 		return;
 	}
-	$key = substr($key,0,$MAXLABEL) if $MAXLABEL;
-	$COUNT{$key}++;
-	if (looks_like_number($value)) {
-		$value = 0+$value;
-	} else {
-		$value = 1;
-	}
-	$RANK{$key} += $value;
-	$TOTAL += $value;
+	really_rankit($key,$value);
 }
 
 sub html_output {

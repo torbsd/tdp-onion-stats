@@ -17,6 +17,7 @@ our $LINE = '';
 our $SEP = '|';
 our $PLAT_OS = 0;
 our $PLAT_VERS = 0;
+our $PLAT_LIST = 0;
 our $NO_PERCENT = 0;
 our $IS_PERCENT = 0;
 our $NO_VALUE = 0;
@@ -79,6 +80,7 @@ $NO_VALUE   = opt('N');
 $PLAT_OS    = opt('O');
 $NO_PERCENT = opt('P');
 $PLAT_VERS  = opt('V');
+$PLAT_LIST  = opt('L');
 $THINGCOL   = int(opt('l',$THINGCOL));
 $VALCOL     = int(opt('v',$VALCOL));
 $SEP        = opt('s',$SEP);
@@ -98,7 +100,15 @@ sub rankit {
 		$key = "Windows" if $key =~ /\bWindows\b/;
 	} elsif ($PLAT_VERS) {
 		$key =~ s/^Tor\s([0-9a-z\.\-]+)\s.*$/$1/;
-	} # else nothing
+	} elsif ($PLAT_LIST) {
+		# used for e.g. bridge transports
+		if ((substr($key,0,1) eq "[") && (substr($key,-1,1) eq "]")) {
+			my @keys = (map { $_ =~ s/(^"|"$)//gs; $_; }
+				    split(/,/,substr($str,1,-2)));
+			rankit($_,$value) foreach (@keys);
+			return;
+		} # else fall through on the recursive call
+	}
 	$key = substr($key,0,$MAXLABEL) if $MAXLABEL;
 	$COUNT{$key}++;
 	$RANK{$key} += $value;

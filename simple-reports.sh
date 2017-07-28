@@ -68,7 +68,7 @@ die () {
 # report bridges details bw-by-os "...jq query..." rankit_opts
 # report relays details bw-by-os "...jq query..." rankit_opts
 report () {
-	typeset what fn nm q out
+	typeset what fn nm q out whatuc
 	what=$1
 	shift
 	fn=$1
@@ -78,15 +78,17 @@ report () {
 	q="$1"
 	shift
 	rankopts="$*"
+	whatuc="`echo ${what} | tr a-z A-Z`"
 	out="${outdir}/${what}-${nm}".txt
 	if [ -f ${out} -a ${overwrite} -eq 0 ]; then
 		echo ".. ${out} exists - skipping"
 	else
 		echo ":: generating ${out}"
 		[ -f ${bplate}/top.txt ] && cat ${bplate}/top.txt > ${out}
-		echo "Report Type: ${what}" >> ${out}
+		echo "Report Type: ${whatuc}" >> ${out}
 		echo "Report Date: `date -u`" >> ${out}
-		echo "Data Source: https://onionoo.torproject.org" >> ${out}
+		echo "Data Source: https://onionoo.torproject.org/${fn}.json" \
+		     >> ${out}
 		[ -f ${bplate}/header_${nm}.txt ] && cat ${bplate}/header_${nm}.txt >> ${out}
 		echo "" >> ${out}
 		# pull wanted cols out of details.json but only for running relays

@@ -87,7 +87,7 @@ report () {
 		[ -f ${bplate}/top.txt ] && cat ${bplate}/top.txt > ${out}
 		echo "Report Type: ${whatuc}" >> ${out}
 		echo "Report Date: `date -u`" >> ${out}
-		echo "Data Source: https://onionoo.torproject.org/${fn}.json" \
+		echo "Data Source: https://onionoo.torproject.org/${fn}" \
 		     >> ${out}
 		[ -f ${bplate}/header_${nm}.txt ] && cat ${bplate}/header_${nm}.txt >> ${out}
 		echo "" >> ${out}

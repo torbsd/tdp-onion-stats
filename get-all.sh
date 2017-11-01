@@ -18,6 +18,6 @@ for type in ${types}; do
     ftp -vo ${now}/${type}.json ${torsrc}/${type}
 done
 du -sh ${now}
-echo packing up ...
-tar -cf - ${now} | xz > stats-${now}.tar.xz
-du -sh stats-${now}.tar.xz
+#echo packing up ...
+#tar -cf - ${now} | xz > stats-${now}.tar.xz
+#du -sh stats-${now}.tar.xz

@@ -1,10 +1,5 @@
 #!/bin/sh
 
-# download all the current data into a date-stamped directory
-# produce an xz-compressed tarball of the resulting dir
-
-# N.B. we run this script on OpenBSD, c.f. https://man.openbsd.org/ftp
-
 torsrc=https://onionoo.torproject.org
 now=`date +%Y%m%d`
 [ ! -d ${now} ] && mkdir ${now}
@@ -15,7 +10,7 @@ else
 fi
 for type in ${types}; do
     echo $type ...
-    ftp -vo ${now}/${type}.json ${torsrc}/${type}
+    ftp -o ${now}/${type}.json ${torsrc}/${type}
 done
 du -sh ${now}
 #echo packing up ...

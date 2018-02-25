@@ -1,12 +1,9 @@
 #!/bin/sh
-# -*- mode:sh; indent-tabs-mode:t; tab-width:8; sh-basic-offset:8 -*-
 
 # produce simple, point-in-time reports based on the JSON onionoo data
 # not unlike the Q&D stats of old, just with better/newer data
 
-#set -e
-
-script="${script:-`basename $0`}"
+script="${script:-$(basename $0)}"
 www="${www:-$HOME/torbsd.github.io}"
 rankitpl=${rankitpl-./rankit.pl}
 bplate=${bplate-bplate}
@@ -47,15 +44,15 @@ optval () {
 # set an option's corresponding sh variable
 setopt () {
 	typeset _nm
-	_nm=`optname "$1"`
+	_nm=$(optname "$1")
 	eval $_nm=1
 }
 
 # like setopt but with a --opt=val style argument
 setoptval () {
 	typeset _nm _vl
-	_nm="`optname $1`"
-	_vl="`optval $1`"
+	_nm="$(optname $1)"
+	_vl="$(optval $1)"
 	eval $_nm=$_vl
 }
 
@@ -78,7 +75,7 @@ report () {
 	q="$1"
 	shift
 	rankopts="$*"
-	whatuc="`echo ${what} | tr a-z A-Z`"
+	whatuc="$(echo ${what} | tr a-z A-Z)"
 	out="${outdir}/${what}-${nm}".txt
 	if [ -f ${out} -a ${overwrite} -eq 0 ]; then
 		echo ".. ${out} exists - skipping"
@@ -86,13 +83,13 @@ report () {
 		echo ":: generating ${out}"
 		[ -f ${bplate}/top.txt ] && cat ${bplate}/top.txt > ${out}
 		echo "Report Type: ${whatuc}" >> ${out}
-		echo "Report Date: `date -u`" >> ${out}
+		echo "Report Date: $(date -u)" >> ${out}
 		echo "Data Source: https://onionoo.torproject.org/${fn}" \
 		     >> ${out}
-		[ -f ${bplate}/header_${nm}.txt ] && cat ${bplate}/header_${nm}.txt >> ${out}
+		[ -f ${bplate}/header_${nm}.txt ] && \
+			cat ${bplate}/header_${nm}.txt >> ${out}
 		echo "" >> ${out}
-		# pull wanted cols out of details.json but only for running relays
-		# pipe the raw data into rankit.pl
+		# if we haven't run this jq query yet, do so
 		tmp=${what}-${fn}.raw
 		if [ ! -f ${indir}/${tmp} ]; then
 			echo "::: generating ${tmp} from ${fn}.json"
@@ -101,8 +98,10 @@ report () {
 		fi
 		perl ${rankitpl} ${rankopts} < ${indir}/${tmp} >>${out}
 		echo "" >> ${out}
-		[ -f ${bplate}/footer_${nm}.txt ] && cat ${bplate}/footer_${nm}.txt >> ${out}
-		[ -f ${bplate}/bottom.txt ] && cat ${bplate}/bottom.txt >> ${out}
+		[ -f ${bplate}/footer_${nm}.txt ] && \
+			cat ${bplate}/footer_${nm}.txt >> ${out}
+		[ -f ${bplate}/bottom.txt ] && \
+			cat ${bplate}/bottom.txt >> ${out}
 	fi
 }
 
@@ -151,7 +150,7 @@ relays bw-by-vers	-V BANDWIDTH VERS
 relays vers-count	-NV COUNT VERS
 relays cweight-by-vers	-IV -v 5 CONSENSUS_WEIGHT_FRAC VERS
 
-# by country: bandwidth, cw
+# by Country: bandwidth, cw
 relays bw-by-cc		-l 2 BANDWIDTH COUNTRY
 relays cweight-by-cc	-I -l 2 -v 5 CONSENSUS_WEIGHT_FRAC COUNTRY
 
@@ -163,7 +162,7 @@ relays cweight-by-asn	-I -l 4 -v 5 CONSENSUS_WEIGHT_FRAC AS_NAME
 
 ## Bridge Reports
 
-# by OS: bandwidth
+# by OS: bandwidth, raw count, transports, transports per OS
 bridges bw-by-os	-O BANDWIDTH OS
 bridges os-count	-NO COUNT OS
 bridges trans-count	-LN -l 2 COUNT TRANSPORT

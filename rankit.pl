@@ -1,6 +1,5 @@
 #! perl
-# -*- mode:perl;tab-width:8;perl-indent-level:8;indent-tabs-mode:t -*-
-
+# rankit.pl - sort inputs by rank (frequency, count) -> report in text or html
 # invoke with --help for usage message
 
 use Modern::Perl;
@@ -33,14 +32,14 @@ our $DATE = strftime("%Y-%m-%d",localtime(time));
 our $NUMFMT = '%.0lf';
 our $PERCFMT = '%.1lf%%';
 our $MAXLABEL = 50;
-our $VERSION = '1.0';
+our $VERSION = '1.1';
 
 $Getopt::Std::STANDARD_HELP_VERSION = 1;
 sub VERSION_MESSAGE { print STDERR qq|rankit.pl v.$VERSION\n|; }
 sub HELP_MESSAGE {
 	print STDERR <<__HeLP__;
 usage: rankit.pl [-HILNOPV] [-t col] [-v col] [-s sep] [-x maxlen]
-  bool opts:
+  Bool opts:
     -H				HTML output (default text)
     -I				value is percentage, dont treat as raw val
     -L                          label is a Perly/Pythonic list (use with -N)
@@ -49,20 +48,20 @@ usage: rankit.pl [-HILNOPV] [-t col] [-v col] [-s sep] [-x maxlen]
     -P				do not report percentages in output
     -U                          value is a Perly/Pythonic list
     -V				extract Tor version from label
-  opts with args:
+  Opts with args:
     -x maxlen			max length of label (def 50)
     -l col			extract label from col (default 0)
     -v col			extract value from col (default 1)
     -s sep			use sep as separator for cols (default bar)
-  description:
-    read a stream of rows with the same columns on stdin one of the
-    columns is or can be transformed into some kind of label another of
-    the columns can be a numeric value associated with the label by
-    default these are columns zero and one, respectively.  the rows are
-    binned by label and the values summed per bin; alternatively,
+  Description:
+    Read a stream of rows with the same columns on stdin.  One of the
+    columns is or can be transformed into some kind of label, another
+    of the columns can be a numeric value associated with the label.
+    By default these are columns zero and one, respectively.  The rows
+    are binned by label and the values summed per bin; alternatively,
     instead of binning values a simple count per label can be
-    accumulated.  the output is sorted by rank (sum of vlues or count)
-    in descending order.
+    accumulated.  The output is sorted by rank (sum of values or
+    counts) in descending order.
 __HeLP__
 }
 
@@ -104,7 +103,7 @@ sub delist {
 	if ((substr($thing,0,1) eq "[") && (substr($thing,-1,1) eq "]")) {
 	        return (map { $_ =~ s/(^"|"$)//gs; $_; }
 			split(/,/,substr($thing,1,-2)));
-	} 
+	}
 	return undef;
 }
 

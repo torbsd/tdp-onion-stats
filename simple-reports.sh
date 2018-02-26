@@ -16,6 +16,8 @@ rtype=plain
 uri_base=/oostats/
 noclear=0
 overwrite=0
+date=
+report_date=
 
 # spit out a helpful message, possibly with an error, and then exit
 usage () {
@@ -34,6 +36,7 @@ usage () {
 	echo "    --bplate=dir      find report boilerplate in dir, default is ${bplate}"
 	echo "    --rtype=type      report type: plain, linked, default is ${rtype}"
 	echo "    --uri-base=base   base for report uris, default is ${uri_base}"
+	echo "    --date=date       set report date, default is today"
 	exit $_xit
 }
 
@@ -165,17 +168,17 @@ report_linked () {
 	shift
 	rankopts="$*"
 	date=$(date +%Y%m%d)
-	mkdir -p ${outdir}/${date}
+	mkdir -p ${outdir}/${report_date}
 	whatuc="$(echo ${what} | tr a-z A-Z)"
 	out_name="${what}-${nm}.html"
 	out_link="${outdir}/${out_name}"
-	out_rel="${date}/${out_name}"
+	out_rel="${report_date}/${out_name}"
 	out="${outdir}/${out_rel}"
 	# if the symlink exists already, read it for the previous date
 	if [ -l ${out_link} ]; then
 		prev=$(readlink ${out_link})
 		prev_date=$(basename $(dirname ${prev}))
-		[ ${prev_date} = ${date} ] && {
+		[ ${prev_date} = ${report_date} ] && {
 			prev_date=""
 		}
 	fi
@@ -186,7 +189,7 @@ report_linked () {
 		     -name '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]' \
 			    -exec basename {} \;) | \
 				    sort | tail -1)
-		if [ ${prev_date} = ${date} ]; then
+		if [ ${prev_date} = ${report_date} ]; then
 			prev_date=$((cd ${outdir}; find . -maxdepth 1 -type d \
 		 -name '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]' \
 				    -exec basename {} \;) | \
@@ -194,9 +197,9 @@ report_linked () {
 		fi
 		if [ -z "${prev_date}" ]; then
 			echo "::: no by-date subdirs in ${outdir}"
-			mkdir -p ${outdir}/${date}
+			mkdir -p ${outdir}/${report_date}
 		fi
-		if [ "${prev_date}" = "${date}" ]; then
+		if [ "${prev_date}" = "${report_date}" ]; then
 			prev_date=""
 		fi
 	fi
@@ -213,10 +216,10 @@ report_linked () {
 		echo "<pre>" >> ${out}
 		echo 'Report Type: ${type}' >> ${out}
 		if [ -z "${prev_date}" ]; then
-			echo 'Report Date: ${date}' >> ${out}
+			echo 'Report Date: ${report_date}' >> ${out}
 		else
 			prev_uri="${uri_base}${prev_date}/${out_name}"
-			echo 'Report Date: ${date} [<a href="'${prev_uri}'">previous report</a>]' >> ${out}
+			echo 'Report Date: ${report_date} [<a href="'${prev_uri}'">previous report</a>]' >> ${out}
 		fi
 		echo 'Data Source: <a href="https://onionoo.torproject.org/'${fn}'">onionoo.torproject.org/'${fn}'</a>' >> ${out}
 		if [ -f ${bplate}/header_${nm}.html.txt ]; then
@@ -249,7 +252,7 @@ report_linked () {
 		# s/// the output file's ${token} things: title, date, type
 		title="${whatuc}: ${nm}"
 		suss_file ${out} \
-			  "title=${title}" "date=${date}" "type=${whatuc}"
+			  "title=${title}" "date=${report_date}" "type=${whatuc}"
 		# finally make the symlink
 		(cd ${outdir}; ln -sf ${out_rel} ${out_name})
 	fi
@@ -275,7 +278,7 @@ while [ $# -gt 0 ]; do
 	case "$1" in
 		--help)				 usage ;;
 		--noclear|--overwrite)		 setopt "$1" ;;
-		--outdir=*|--indir=*|--bplate=*|--rtype=*|--uri-base=*)
+		--outdir=*|--indir=*|--bplate=*|--rtype=*|--uri-base=*|--date=*)
 						 setoptval "$1" ;;
 		*)				 usage "bad argument" ;;
 	esac
@@ -285,6 +288,18 @@ done
 [ "${rtype}" != plain -a "${rtype}" != linked ] && {
 	die "--rtype=${rtype} invalid; must be plain or linked"
 }
+[ -z "${date}" ] && {
+	case ${indir} in
+		[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9])
+			date=${indir}
+			;;
+		*)
+			date=$(date +%Y%m%d)
+			;;
+	esac
+	echo "::: report date: ${date}"
+}
+report_date=${date}
 [ ! -f ${indir}/details.json ] && {
 	die "could not find input file: ${indir}/details.json"
 }

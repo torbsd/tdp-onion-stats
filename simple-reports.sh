@@ -248,7 +248,7 @@ report_linked () {
 			cat ${bplate}/bottom.txt >> ${out}
 		fi
 		# s/// the output file's ${token} things: title, date, type
-		title="${whatuc}: ${nm}"
+		title="${report_date}: ${whatuc} ${nm}"
 		suss_file ${out} \
 			  "title=${title}" "date=${report_date}" "type=${whatuc}"
 		# finally make the symlink

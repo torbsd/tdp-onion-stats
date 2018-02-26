@@ -203,8 +203,6 @@ report_linked () {
 			prev_date=""
 		fi
 	fi
-	# report the previous date if we found it
-	[ -n "${prev_date}" ] && echo "::: previous date: ${prev_date}"
 	if [ -f ${out} -a ${overwrite} -eq 0 ]; then
 		echo ".. ${out} exists - skipping"
 	else
@@ -216,10 +214,10 @@ report_linked () {
 		echo "<pre>" >> ${out}
 		echo 'Report Type: ${type}' >> ${out}
 		if [ -z "${prev_date}" ]; then
-			echo 'Report Date: ${report_date}' >> ${out}
+			echo 'Report Date: ${date}' >> ${out}
 		else
 			prev_uri="${uri_base}${prev_date}/${out_name}"
-			echo 'Report Date: ${report_date} [<a href="'${prev_uri}'">previous report</a>]' >> ${out}
+			echo 'Report Date: ${date} [<a href="'${prev_uri}'">previous report</a>]' >> ${out}
 		fi
 		echo 'Data Source: <a href="https://onionoo.torproject.org/'${fn}'">onionoo.torproject.org/'${fn}'</a>' >> ${out}
 		if [ -f ${bplate}/header_${nm}.html.txt ]; then

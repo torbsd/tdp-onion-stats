@@ -1,5 +1,5 @@
 
-Copyright (C) 2017 by Tor Diversity Project <info@torbsd.org>
+Copyright (C) 2017-2018 by Tor Diversity Project <info@torbsd.org>
 All Rights Reserved.
 
 Released under an ISC license; see the GitHub repository

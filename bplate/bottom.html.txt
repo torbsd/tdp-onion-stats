@@ -1,0 +1,7 @@
+<hr>
+<p><em>Copyright (C) 2017-2018 by Tor Diversity Project <info@torbsd.org>
+All Rights Reserved.</em></p>
+<p>Released under an ISC license; see the GitHub repository
+for details at <a href="https://github.com/torbsd/tdp-onion-stats/">https://github.com/torbsd/tdp-onion-stats/</a></p>
+</body>
+</html>

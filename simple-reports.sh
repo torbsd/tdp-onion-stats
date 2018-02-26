@@ -175,7 +175,7 @@ report_linked () {
 	out_rel="${report_date}/${out_name}"
 	out="${outdir}/${out_rel}"
 	# if the symlink exists already, read it for the previous date
-	if [ -l ${out_link} ]; then
+	if [ -L ${out_link} ]; then
 		prev=$(readlink ${out_link})
 		prev_date=$(basename $(dirname ${prev}))
 		[ ${prev_date} = ${report_date} ] && {
